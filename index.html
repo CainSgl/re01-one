@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>机械波演示</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: #f5f5f5;
+            user-select: none; /* 防止文本被选中 */
+            cursor: default; /* 改变鼠标指针的样式 */
+        }
+        canvas {
+            display: block;
+            border: 1px solid #ccc;
+            margin: 0 auto;
+            background-color: #fff;
+        }
+        #controls {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        #controls input {
+            margin: 0 5px;
+        }
+    </style>
+</head>
+<body>
+    <div id="controls">
+        <div>
+            <span id="waveSpeedSpan"></span> <input type="range" id="waveSpeed" value="1" min="0.1" step="0.1" max="5" oninput="startWave()"> </div>
+        <div>   
+            <span id="particleNumSpan"></span> <input type="range" id="particleNum" value="100" step="1" min="1"      max="200" oninput="startWave()"></div>
+        <div>
+            <span id="waveWidthSpan"></span><input type="range" id="waveWidth" value="100" step="0.1" max="100"      min="3" oninput="startWave()">
+        </div>
+        <div>
+     <span id="particleWidthSpan"></span><input type="range" id="particleWidth" value="4" step="0.1" max="100"      min="3" oninput="startWave()">
+                                                                                                                                                                                            
+    <canvas id="waveCanvas"></canvas>
+    <script>
+        const canvas = document.getElementById('waveCanvas');
+        const ctx = canvas.getContext('2d');
+        const width = canvas.width = 800;
+        const height = canvas.height = 200;
+    
+
+            let particleNum;
+            let rectAngleWidth;
+            let waveSpeed;
+            let DrawAnimation;
+            let medium =Array.from({ length: particleNum }, () => 0);
+            let waveWidth;
+        function startWave() {
+        
+
+
+            waveSpeed = parseFloat(document.getElementById('waveSpeed').value);
+            particleNum = parseFloat(document.getElementById('particleNum').value);
+            waveWidth=parseFloat(document.getElementById('waveWidth').value);
+            rectAngleWidth= parseFloat(document.getElementById('particleWidth').value);
+
+            document.getElementById("particleNumSpan").textContent='质点数:'+particleNum+'(个)';
+           document.getElementById("waveSpeedSpan").textContent='ω:'+waveSpeed+'π';
+           document.getElementById("waveWidthSpan").textContent='振幅:'+waveWidth+'(像素)';
+           document.getElementById("particleWidthSpan").textContent='质点宽度:'+rectAngleWidth+'(像素)';
+           
+            // rectAngleWidth=800/particleNum
+            medium = Array.from({ length: particleNum }); //得到每个正方体的具体y位置;
+            clearInterval(DrawAnimation);
+            DrawAnimation= setInterval(()=>{
+                draw(); 
+            },10)//100Fps
+        }
+        function draw()
+        {
+            ctx.clearRect(0, 0, width, height);
+            for (let i = 0; i <particleNum; i++) {
+                let x = i * (width / particleNum);
+                let y = height / 2 + medium[i];
+                ctx.fillRect(x - 1, y - 1, rectAngleWidth, rectAngleWidth);
+            }
+            update();
+        }
+        let time=0;
+        function update() {
+            time += 1 / 100; // 假设60fps
+            for (let i = 0; i < particleNum; i++) {
+                medium[i] = calculateDisplacement(i, time);
+            }
+        }
+
+        function calculateDisplacement(position, time) {
+            return waveWidth * Math.sin(2 * Math.PI * (position*0.01 + waveSpeed * time));
+        }
+        startWave();
+    </script>
+</body>
+</html>
